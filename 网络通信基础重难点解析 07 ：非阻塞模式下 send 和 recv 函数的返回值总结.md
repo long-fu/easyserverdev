@@ -35,46 +35,45 @@
   {
       printf("send data successfully\n");
   }
-  
-
-
-
-    //推荐的方式二：在一个循环里面根据偏移量发送数据
-    bool SendData(const char* buf, int buf_length)
-    {
-        //已发送的字节数目
-        int sent_bytes = 0;
-        int ret = 0;
-        while (true)
-        {
-            ret = send(m_hSocket, buf + sent_bytes, buf_length - sent_bytes, 0);
-            if (ret == -1)
-            {
-                if (errno == EWOULDBLOCK)
-                {
-                    //严谨的做法，这里如果发不出去，应该缓存尚未发出去的数据，后面介绍
-                    break;
-                }
-                else if (errno == EINTR)
-                    continue;
-                else
-                    return false;
-            }
-            else if (ret == 0)
-            {
-                return false;
-            }
-    
-            sent_bytes += ret;
-            if (sent_bytes == buf_length)
-                break;
-    
-            //稍稍降低 CPU 的使用率
-            usleep(1);
-        }
-    
-        return true;
-    }
+  ```
+//推荐的方式二：在一个循环里面根据偏移量发送数据
+```
+	
+	bool SendData(const char* buf, int buf_length)
+	{
+	//已发送的字节数目
+	int sent_bytes = 0;
+	int ret = 0;
+	while (true)
+	{
+	    ret = send(m_hSocket, buf + sent_bytes, buf_length - sent_bytes, 0);
+	    if (ret == -1)
+	    {
+		if (errno == EWOULDBLOCK)
+		{
+		    //严谨的做法，这里如果发不出去，应该缓存尚未发出去的数据，后面介绍
+		    break;
+		}
+		else if (errno == EINTR)
+		    continue;
+		else
+		    return false;
+	    }
+	    else if (ret == 0)
+	    {
+		return false;
+	    }
+	
+	    sent_bytes += ret;
+	    if (sent_bytes == buf_length)
+		break;
+	
+	    //稍稍降低 CPU 的使用率
+	    usleep(1);
+	}
+	
+	return true;
+	}
 
  ```
 ​    
